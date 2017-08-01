@@ -4,47 +4,12 @@
 var express = require('express');
 // generate a new express app and call it 'app'
 var app = express();
-
+var createAlbums = require('./seed.js');
 // serve static files from public folder
 app.use(express.static(__dirname + '/public'));
-
-/************
- * DATABASE *
- ************/
-
-/* hard-coded data */
-var albums = [];
-albums.push({
-              _id: 132,
-              artistName: 'the Old Kanye',
-              name: 'The College Dropout',
-              releaseDate: '2004, February 10',
-              genres: [ 'rap', 'hip hop' ]
-            });
-albums.push({
-              _id: 133,
-              artistName: 'the New Kanye',
-              name: 'The Life of Pablo',
-              releaseDate: '2016, Febraury 14',
-              genres: [ 'hip hop' ]
-            });
-albums.push({
-              _id: 134,
-              artistName: 'the always rude Kanye',
-              name: 'My Beautiful Dark Twisted Fantasy',
-              releaseDate: '2010, November 22',
-              genres: [ 'rap', 'hip hop' ]
-            });
-albums.push({
-              _id: 135,
-              artistName: 'the sweet Kanye',
-              name: '808s & Heartbreak',
-              releaseDate: '2008, November 24',
-              genres: [ 'r&b', 'electropop', 'synthpop' ]
-            });
-
-
-
+var db = require('./models');
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
 /**********
  * ROUTES *
  **********/
@@ -52,11 +17,10 @@ albums.push({
 /*
  * HTML Endpoints
  */
-
+createAlbums();
 app.get('/', function homepage (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
-
 
 /*
  * JSON API Endpoints
@@ -74,8 +38,38 @@ app.get('/api', function api_index (req, res){
 });
 
 app.get('/api/albums', function album_index(req, res){
+  db.Album.find({}, function(err, albums) {
+    res.json(albums);
+  });
+  
+});
 
-})
+// Add New albums
+
+app.post('/api/albums', function newAlbumPost(req, res) {
+    var newArtistName = req.body.artistName;
+    var newName = req.body.name;
+    var newReleaseDate = req.body.releaseDate;
+    var genres = [req.body.genres];
+    var newAlbum = {
+      artistName: newArtistName,
+      name: newName,
+      releaseDate: newReleaseDate,
+      genres: genres
+    };
+    db.Album.create(newAlbum, function(err, newAlbum) {
+      if(err) {
+        console.log(err);
+      } else {
+        res.redirect('/api/albums');
+      }
+    
+  });
+  
+});
+app.delete('/api/albums/:id', function deleteAlbum(req, res) {
+
+});
 
 /**********
  * SERVER *
