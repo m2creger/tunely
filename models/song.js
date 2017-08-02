@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-let SongSchema = new Schema ({
+var SongSchema = new Schema ({
 	 name: String,
   	 trackNumber: Number
 });

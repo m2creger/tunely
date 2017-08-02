@@ -67,9 +67,51 @@ app.post('/api/albums', function newAlbumPost(req, res) {
   });
   
 });
-app.delete('/api/albums/:id', function deleteAlbum(req, res) {
 
+app.post('/api/albums/:album_id/songs', function newSongAddedToAlbum(req, res) {
+  var newSongName = req.body.name;
+  var newTrackNumber = req.body.trackNumber;
+  var albumID = req.params.album_id;
+  console.log("The album id is " + albumID);
+  console.log("The song received is " + newSongName);
+  console.log("The track number received is " + newTrackNumber);
+  var newSong = new db.Song({
+    name: newSongName,
+    trackNumber: newTrackNumber
+  })
+  console.log(newSong);
+  db.Album.findOne({_id: albumID}, function(err, album) {
+    if (err) {
+      return console.log(err);
+    } else {
+      console.log("album found***********");
+      console.log(album);
+      console.log(newSong);
+      // add song to albums songs array
+      album.songs.push(newSong);
+      // save album
+      album.save();
+      console.log(album);
+      // send back the response
+      res.json(newSong);
+    };
+  });
+  //res.redirect('/api/albums/:id') 
 });
+
+app.get('/api/albums/:id', function updatedAlbum(req, res) {
+  console.log("Getting album");
+  var albumID = req.params.id;
+  console.log(albumID);
+  db.Album.findOne({_id: albumID}, function(err, album) {
+    console.log(album);
+    res.json(album);
+  });
+  
+})
+// app.delete('/api/albums/:id', function deleteAlbum(req, res) {
+
+// });
 
 /**********
  * SERVER *

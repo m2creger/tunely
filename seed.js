@@ -65,27 +65,16 @@ function createNewAlbum() {
     console.log("removed albums");
     albumsList.forEach(function(album) {
         db.Album.create(album, function(err, newAlbum) {
-          if (err) {
-            console.log(err)
-          } else {
-            sampleSongs.forEach(function(song) {
-              db.Song.create({song}, function(err, newSong) {
-                if(err) {
-                  console.log(err)
-                } else {
-                  console.log("Success" + newSong);
-                  newAlbum.songs.push(newSong);
-                  newAlbum.save();
-                }
-              });
-            })
-          }
-        });
-      });
-     //process.exit();
-  });
+          //console.log(newAlbum.songs);
 
-}
+          newAlbum.songs = sampleSongs;
+          console.log("The new album is " + newAlbum);
+          newAlbum.save();
+        });
+     //process.exit();
+    });
+   }); 
+};
 
 
 module.exports = createNewAlbum;
